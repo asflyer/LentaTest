@@ -29,7 +29,11 @@ mvn clean test -Dtest=FirstTest
 
 public class FirstTest extends Helper
 {
-
+        /*
+        ДОДЕЛАТЬ !!!
+        Для различных размеров окна разные варианты функц
+        добавить класс Model куда запихнуть модель "товар" со свойствами цена, название
+         */
 
     @Test
     public void CookieChecksTest()   //имя метода с маленькой, имя Класса с большой
@@ -81,95 +85,48 @@ public class FirstTest extends Helper
     @Test
     public void addingSomeGoodsTest() throws IOException, UnsupportedFlavorException    //имя метода с маленькой, имя Класса с большой
     {
-        int N = 113; //Количество добавляемых товаров
+        int N = 13; //Количество добавляемых товаров
         ArrayList addingList = new ArrayList<String>(N); //Список покупок
         //String town = "Курган";
         String town = "Калуга";
-
         //String category = "Кондитерские изделия";
         String category = "Чай, кофе, какао";
-        /*
-        ДОДЕЛАТЬ !!!
 
-        Для различных размеров окна разные варианты функций
-
-        добавить класс Model куда запихнуть модель "товар" со свойствами цена, название
-
-         */
         firstCityPick(town);
-
         openCategory(category);
-
         addingGoodsToShoppingCart(addingList, N);
-
         //Демонстрационный метод
         //shoppingListToText();
-
         checkShoppingList(addingList);
-
         getShoppingListLink();
     }
 
 @Test public void addingGoodsToLogInUser() throws IOException, UnsupportedFlavorException
 {
+    /*
+    Добавление товаров авторизованному пользователю. Авторизация, добавление товаров,
+    Открытие мобильной версии, проверка, что товары были добавлены в корзину юзера
+     */
     String town = "Калуга";
     int N = 5; //Количество добавляемых товаров
     ArrayList addingList = new ArrayList<String>(N); //Список покупок
     String category = "Чай, кофе, какао";
-    String loginValue = "epiadmin";
-    String passwordValue = "Password1234!";
-
 
     firstCityPick(town);
-
-    LogIn (loginValue, passwordValue);
-
+    LogIn ();
     clearShoppingList();
     openCategory(category);
     addingGoodsToShoppingCart(addingList, N);
-
     driver.quit();
     //запустить мобилу
-
-
     startMobileDriver();
     firstCityPick(town);
-    //LogIn (loginValue, passwordValue);
-    LogInMobile (loginValue, passwordValue);
+    LogIn ();
     checkShoppingList(addingList);
-
     getShoppingListLink();
-
-    //должно быть ок. не запускал. проверить предыдущие тесты
-
-
 }
 
-    public void clearShoppingList()
-    {
 
-        driver.findElement(By.cssSelector("[class=\"header__cart-text\"]")).click();
-        wait.until(ExpectedConditions.visibilityOfElementLocated((By.cssSelector("[class=\"shopping-list__title\"]"))));
-
-        try
-        {
-            driver.findElement(By.cssSelector("[class=\"shopping-list__notified-message\"]"));
-        }
-        catch (NoSuchElementException e)
-        {
-            driver.findElement(By.cssSelector("[class=\"shopping-list__clear-button\"]")).click();
-
-            wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("[class=\"popup__title\"]")));
-            driver.findElement(By.cssSelector("[class=\"button button--small button--primary clear-list-popup__control-button\"]")).click();
-
-            wait.until(ExpectedConditions.visibilityOfElementLocated((By.cssSelector("[class=\"shopping-list__title\"]"))));
-
-        }
-
-        String emptyText = driver.findElement(By.cssSelector("[class=\"shopping-list__notified-message\"]")).getAttribute("innerHTML");
-        Assert.assertEquals(emptyText, "Тут пока пусто, вы можете добавить сюда товары из каталога");
-
-    }
 
 
 }

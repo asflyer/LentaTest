@@ -20,10 +20,10 @@ public class Web
     public WebDriverWait wait;
     public File scrFile;
 
-    int implicitlyWait = 15;
+    int implicitlyWait = 5;
     public String site;
 
-    int env = 1;// 1 = "prod";
+    int env = 2;// 1 = "prod";
     // 2 = "stage";
 
     @Before
@@ -59,7 +59,8 @@ public class Web
         driver = new ChromeDriver();
         driver.manage().window().setSize(new Dimension(375, 667)); //iPhone 6/7/8
         driver.get("https://" + site + ".com/"); //открытие браузера
-        wait = new WebDriverWait(driver, 15);
+        wait = new WebDriverWait(driver, 10);
+        jse = (JavascriptExecutor)driver; //Для скороллов
     }
 
     @After

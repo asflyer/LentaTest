@@ -2,9 +2,11 @@ package lenta;
 
 import org.junit.Assert;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Wait;
 
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
@@ -69,10 +71,8 @@ public class Helper extends NavigatorHelper
                 String tv, tv1;
                 tv = item.findElement(By.cssSelector("[class=\"sku-card-small__title\"]")).getAttribute("innerHTML");//название товара
                 tv1 = item.findElement(By.cssSelector("[class=\"card-item-counter__control-container\"]")).findElement(By.tagName("span")).getAttribute("innerHTML");
-
                 //Демонстрационный вывод в консоль
                 System.out.println(i-firstItem+1 + ") " + tv + " - " + tv1); //вывод в консоль названия и анимации "Товар добавлен"
-
                 if(i-firstItem+1 < 101)
                 {
                     Assert.assertEquals(tv1,"Товар добавлен");
@@ -98,45 +98,77 @@ public class Helper extends NavigatorHelper
     }
 
 
-    public void LogIn (String loginValue, String passwordValue)
+
+
+    public void getShoppingListLink() throws IOException, UnsupportedFlavorException
     {
-        driver.findElement(By.cssSelector("[class=\"header__personal-cabinet-text\"]")).click();
-        driver.findElement(By.cssSelector("[class=\"header__profile-menu-inner\"]")).findElement(By.tagName("svg")).click();
-
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("login-app__title")));
-
-        WebElement login = driver.findElement(By.name("login"));
-
-        login.findElement(By.cssSelector("input[type=\"text\"]")).sendKeys(loginValue);
-        login.findElement(By.cssSelector("input[type=\"password\"]")).sendKeys(passwordValue);
-        login.findElement(By.cssSelector("button[type=\"submit\"]")).click();
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("[class=\"header__logo\"]")));
-    }
-
-    public void getShoppingListLink() throws IOException, UnsupportedFlavorException {
         driver.findElement(By.cssSelector("[class=\"sharing-control__icon\"]")).click();
-        driver.findElement(By.cssSelector("[class=\"sharing-option__icon-circle\"]")).click();
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("[class=\"sharing-option sharing-option--copy\"]")));
+        WebElement lin = driver.findElement(By.cssSelector("[class=\"sharing-option sharing-option--copy\"]"));
+        jse.executeScript("arguments[0].scrollIntoView();", lin);
+        lin.click();
         String link = (String) Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor);
         //текст из буфера обмена
         System.out.println(link);
     }
 
-    public void LogInMobile (String loginValue, String passwordValue)
+    public void LogIn ()
     {
-        driver.findElement(By.cssSelector("[class=\"header__bar-wrap\"]")).findElement(By.xpath("a[4]")).click();
-        driver.findElement(By.cssSelector("[class=\"header__profile-menu-inner\"]")).findElement(By.xpath("a[1]")).click();
+        String loginValue = "";
+        String passwordValue = "";
+        if (env == 1)
+        {
+            loginValue = "79095788078";
+            passwordValue = "alistan747";
+        }
+        else if (env == 2)
+        {
+            loginValue = "epiadmin";
+            passwordValue = "Password1234!";
+        }
 
+        Dimension size = driver.manage().window().getSize();
+        System.out.println(size);
+        if (size.width < 1000)
+        {
+            wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("[class=\"header__bar-wrap\"]")));
+            driver.findElement(By.cssSelector("[class=\"header__bar-wrap\"]")).findElement(By.xpath("a[4]")).click();
+            wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("[class=\"header__profile-menu-inner\"]")));
+            driver.findElement(By.cssSelector("[class=\"header__profile-menu-inner\"]")).findElement(By.xpath("a[1]")).click();
+        }
+        else
+        {
+            wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("[class=\"header__personal-cabinet-text\"]")));
+            driver.findElement(By.cssSelector("[class=\"header__personal-cabinet-text\"]")).click();
+            wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("[class=\"header__profile-menu-inner\"]")));
+            driver.findElement(By.cssSelector("[class=\"header__profile-menu-inner\"]")).findElement(By.tagName("svg")).click();
+        }
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("login-app__title")));
-
         WebElement login = driver.findElement(By.name("login"));
-
         login.findElement(By.cssSelector("input[type=\"text\"]")).sendKeys(loginValue);
         login.findElement(By.cssSelector("input[type=\"password\"]")).sendKeys(passwordValue);
         login.findElement(By.cssSelector("button[type=\"submit\"]")).click();
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("[class=\"header__logo\"]")));
-
     }
 
+    public void clearShoppingList()
+    {
 
+        driver.findElement(By.cssSelector("[class=\"header__cart-text\"]")).click();
+        wait.until(ExpectedConditions.visibilityOfElementLocated((By.cssSelector("[class=\"shopping-list__title\"]"))));
+        try
+        {
+            driver.findElement(By.cssSelector("[class=\"shopping-list__notified-message\"]"));
+        }
+        catch (NoSuchElementException e)
+        {
+            driver.findElement(By.cssSelector("[class=\"shopping-list__clear-button\"]")).click();
+            wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("[class=\"popup__title\"]")));
+            driver.findElement(By.cssSelector("[class=\"button button--small button--primary clear-list-popup__control-button\"]")).click();
+            wait.until(ExpectedConditions.visibilityOfElementLocated((By.cssSelector("[class=\"shopping-list__title\"]"))));
+        }
+        String emptyText = driver.findElement(By.cssSelector("[class=\"shopping-list__notified-message\"]")).getAttribute("innerHTML");
+        Assert.assertEquals(emptyText, "Тут пока пусто, вы можете добавить сюда товары из каталога");
+    }
 
 }
